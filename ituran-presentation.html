@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תוכנית הטמעת בינה מלאכותית יוצרת - איתוראן טק</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --main-bg-color: #0b296e;
+            --light-text: #FFFFFF;
+            --accent-color: #3E92CC;
+            --highlight-color: #59C3C3;
+            --contrast-color: #F1A208;
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--main-bg-color);
+            color: var(--light-text);
+        }
+        
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .slide-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--light-text);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .slide-subtitle {
+            font-size: 2.2rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: var(--highlight-color);
+        }
+        
+        .slide-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            text-align: right;
+        }
+        
+        .text-block {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            text-align: right;
+            width: 100%;
+        }
+        
+        .milestone {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .milestone-icon {
+            font-size: 2.5rem;
+            margin-left: 1.5rem;
+            color: var(--contrast-color);
+        }
+        
+        .milestone-content {
+            text-align: right;
+        }
+        
+        .milestone-title {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--highlight-color);
+        }
+        
+        .milestone-details {
+            font-size: 1.4rem;
+        }
+        
+        .milestone-details ul {
+            margin: 0.5rem 0;
+            padding-right: 1.5rem;
+        }
+        
+        .milestone-details li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .slide-note {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .nav-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: var(--light-text);
+            font-size: 1.5rem;
+        }
+        
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .timeline {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: var(--accent-color);
+            z-index: 1;
+        }
+        
+        .timeline-item {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        
+        .timeline-marker {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--highlight-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .timeline-label {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+        
+        .timeline-sublabel {
+            text-align: center;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            height: 4rem;
+            width: auto;
+            opacity: 0.8;
+        }
+        
+        .two-column {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .column {
+            width: 48%;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 2rem;
+            background-color: var(--contrast-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--main-bg-color);
+            font-weight: 700;
+            transition: width 1s ease-in-out;
+        }
+    </style>
+    <!-- Including Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active" id="slide1">
+            <img src="/api/placeholder/150/50" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">תוכנית הטמעת בינה מלאכותית יוצרת</div>
+            <div class="slide-subtitle">מפת דרכים אסטרטגית ליישום</div>
+            <div class="slide-content">
+                <div class="text-block">
+                    שילוב בינה מלאכותית יוצרת במחזור חיי פיתוח התוכנה של איתוראן טק
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 100%">תוכנית 6 חודשים</div>
+                </div>
+                <img src="./slide_1.png" alt="בינה מלאכותית יוצרת" style="max-width: 70%; margin: 2rem 0;">
+            </div>
+        </div>
+        
+        <!-- Slide 2: Overview -->
+        <div class="slide" id="slide2">
+            <img src="/api/placeholder/150/50" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">סקירה כללית</div>
+            <div class="slide-content">
+                <div class="text-block">
+                    תוכנית שילוב הבינה המלאכותית היוצרת מחולקת ל-3 שלבים אסטרטגיים המתוכננים להבטיח:
+                </div>
+                
+                <div class="milestone">
+                    <i class="fas fa-check-circle milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">אימוץ חלק</div>
+                        <div class="milestone-details">תהליך הדרגתי ומובנה להטמעת כלי AI בצוותי הפיתוח</div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-chart-line milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">תוצאות מדידות</div>
+                        <div class="milestone-details">מדדים ברורים להערכת השיפור בפריון, איכות הקוד וזמני פיתוח</div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-users-cog milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">בניית יכולות ארגוניות</div>
+                        <div class="milestone-details">פיתוח מיומנויות, תשתיות וידע לטווח ארוך בתחום ה-AI</div>
+                    </div>
+                </div>
+                <img src="./slide_2.png" alt="שלבים אסטרטגיים" style="max-width: 40%; max-height: 40%; ">
+            </div>
+        </div>
+        
+        <!-- Slide 3: Phase 1 -->
+        <div class="slide" id="slide3">
+            <img src="/api/placeholder/150/50" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">שלב 1: תשתיות ומוכנות</div>
+            <div class="slide-subtitle">חודשים 1-2</div>
+            <div class="slide-content">
+                <div class="milestone">
+                    <i class="fas fa-gavel milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">הקמת ממשל ומדיניות AI</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>הקמת ועדת היגוי ייעודית ל-AI</li>
+                                <li>ניסוח הנחיות מקיפות לאבטחה, שימוש אתי, והגנת מידע</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-tools milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">הערכת וקביעת כלי AI</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>בחירת כלי AI מיטביים לשימושים ספציפיים בצוותים</li>
+                                <li>הגדרת גישה מאובטחת ל-API ושילוב בסביבות הפיתוח</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-graduation-cap milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">תוכנית הכשרה בסיסית</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>סדנאות היכרות עם יסודות הבינה המלאכותית היוצרת</li>
+                                <li>הדרכות בטכניקות ניסוח (prompting) ובהנחיות אבטחה</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-flask milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">זיהוי ותכנון פרויקטי פיילוט</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>בחירת פרויקטים ראשוניים בכל צוות עם תוצאות מדידות</li>
+                                <li>פיתוח קריטריוני הצלחה ומדדי בסיס להערכת יעילות</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Phase 2 -->
+        <div class="slide" id="slide4">
+            <img src="/api/placeholder/150/50" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">שלב 2: יישום פיילוטים ממוקדים</div>
+            <div class="slide-subtitle">חודשים 3-4</div>
+            <div class="slide-content">
+                <div class="milestone">
+                    <i class="fas fa-rocket milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">הפעלת פיילוטים</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>יישום כלי AI בפרויקטים נבחרים בכל צוות</li>
+                                <li>ניטור ומדידת שיפורים בפריון, איכות ואימוץ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-book milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">פיתוח ספריית הנחיות (prompts)</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>יצירת ספריות הנחיות מותאמות לתחומי הפעילות</li>
+                                <li>ייעול תהליכי עבודה והעלאת אפקטיביות תוצרי ה-AI</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-sync milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">משוב והתאמות שוטפות</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>הקמת מנגנוני משוב מובנים מהמפתחים</li>
+                                <li>שיפור תהליכי העבודה ותבניות הניסוח בהתאם למשוב</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-shield-alt milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">אימות ממשל ואבטחה</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>ביצוע סקירות וביקורות מקיפות של השימוש בכלי AI</li>
+                                <li>וידוא עמידה במדיניות האבטחה וצמצום סיכונים</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Phase 3 -->
+        <div class="slide" id="slide5">
+            <img src="./ituran_tech_logo.png" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">שלב 3: הטמעה כלל-ארגונית ואופטימיזציה</div>
+            <div class="slide-subtitle">חודשים 5-6</div>
+            <div class="slide-content">
+                <div class="milestone">
+                    <i class="fas fa-network-wired milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">פריסה מורחבת בכל הצוותים</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>הרחבת שילוב ה-AI מפרויקטי פיילוט ליישום ארגוני רחב</li>
+                                <li>שילוב מלא בתהליכי הפיתוח היומיומיים</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-award milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">הכשרות מתקדמות ובניית מיומנויות</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>השקת סדנאות הכשרה מתקדמים למשתמשים מתקדמים</li>
+                                <li>הקמת מסלולי הסמכה פנימיים לעידוד מומחיות ב-AI</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-cogs milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">שילוב ב-CI/CD ואוטומציה</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>הטמעת כלי AI בתהליכי CI/CD לשיפור יעילות ואבטחה</li>
+                                <li>אוטומציה של שיפורי קוד מערכתיים ועריכות רב-קובציות</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-chart-pie milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">ניטור ביצועים והערכת ROI</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>מדידת השפעות שילוב ה-AI מול מדדי ההצלחה שהוגדרו</li>
+                                <li>תיעוד ניתוחי ROI מקיפים וכימות השיפורים</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Timeline -->
+        <div class="slide" id="slide6">
+            <img src="/api/placeholder/150/50" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">לוח זמנים ליישום</div>
+            <div class="slide-subtitle">תוכנית 6 חודשים</div>
+            <div class="slide-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker">1</div>
+                        <div class="timeline-label">שלב 1: תשתיות ומוכנות</div>
+                        <div class="timeline-sublabel">חודשים 1-2</div>
+                        <div class="milestone-details" style="margin-top: 1rem;">
+                            <ul>
+                                <li>הקמת ממשל ומדיניות AI</li>
+                                <li>הגדרת והקמת כלים</li>
+                                <li>הכשרה בסיסית</li>
+                                <li>זיהוי פרויקטי פיילוט</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker">2</div>
+                        <div class="timeline-label">שלב 2: יישום פיילוטים</div>
+                        <div class="timeline-sublabel">חודשים 3-4</div>
+                        <div class="milestone-details" style="margin-top: 1rem;">
+                            <ul>
+                                <li>הפעלת פיילוטים</li>
+                                <li>פיתוח ספריות prompts</li>
+                                <li>איסוף משוב והתאמות</li>
+                                <li>אימות ממשל ואבטחה</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker">3</div>
+                        <div class="timeline-label">שלב 3: הטמעה כלל-ארגונית</div>
+                        <div class="timeline-sublabel">חודשים 5-6</div>
+                        <div class="milestone-details" style="margin-top: 1rem;">
+                            <ul>
+                                <li>פריסה בכל הצוותים</li>
+                                <li>הכשרות מתקדמות</li>
+                                <li>שילוב ב-CI/CD</li>
+                                <li>מדידת ROI ותכנון המשך</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <img src="./slide_6.png" alt="שלבים אסטרטגיים" style="max-width: 50%; max-height: 50%; margin: 1.5rem 0;">
+            </div>
+        </div>
+        
+        <!-- Slide 7: Summary -->
+        <div class="slide" id="slide7">
+            <img src="/api/placeholder/150/50" alt="איתוראן טק לוגו" class="logo">
+            <div class="slide-title">סיכום וצעדים להמשך</div>
+            <div class="slide-content">
+                <div class="milestone">
+                    <i class="fas fa-lightbulb milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">חזון ארוך טווח</div>
+                        <div class="milestone-details">
+                            הפיכת איתוראן טק למובילה בתחום שילוב בינה מלאכותית בתהליכי פיתוח תוכנה, תוך יצירת יתרון תחרותי משמעותי.
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-tasks milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">גורמי הצלחה קריטיים</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>מחויבות הנהלה ותמיכה ארגונית</li>
+                                <li>הכשרה והעצמה של צוותי הפיתוח</li>
+                                <li>שיתוף פעולה בין-צוותי</li>
+                                <li>מדידה שיטתית והתאמות מבוססות נתונים</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-bullseye milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">תוצאות צפויות</div>
+                        <div class="milestone-details">
+                            <ul>
+                                <li>העלאת פריון הפיתוח ב-30% לפחות</li>
+                                <li>שיפור איכות הקוד וצמצום פגמים</li>
+                                <li>האצת זמן הגעה לשוק במוצרים חדשים</li>
+                                <li>חיסכון בעלויות פיתוח ותחזוקה לטווח ארוך</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <i class="fas fa-forward milestone-icon"></i>
+                    <div class="milestone-content">
+                        <div class="milestone-title">הצעדים הבאים</div>
+                        <div class="milestone-details">
+                            קביעת פגישת התנעה עם מנהלי הצוותים לתחילת שלב 1 והקמת ועדת ההיגוי ל-AI עד סוף החודש הנוכחי.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation controls -->
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn"><i class="fas fa-chevron-right"></i></button>
+            <button class="nav-btn" id="nextBtn"><i class="fas fa-chevron-left"></i></button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            
+            function showSlide(n) {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (n + slides.length) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+            
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                showSlide(currentSlide + 1);
+            });
+            
+            document.getElementById('prevBtn').addEventListener('click', function() {
+                showSlide(currentSlide - 1);
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight') {
+                    showSlide(currentSlide - 1);
+                } else if (e.key === 'ArrowLeft') {
+                    showSlide(currentSlide + 1);
+                }
+            });
+            
+            // Swipe navigation for touch devices
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                if (touchEndX < touchStartX - 50) {
+                    showSlide(currentSlide + 1);
+                }
+                if (touchEndX > touchStartX + 50) {
+                    showSlide(currentSlide - 1);
+                }
+            }
+            
+            // Full screen toggle
+            document.addEventListener('dblclick', function() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
